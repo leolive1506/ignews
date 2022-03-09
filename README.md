@@ -1,34 +1,61 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
-
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
+# Adicionar ts
+```sh
+npm install typescript @types/react @types/node -D
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- No app.tsx
+```ts
+import { AppProps } from 'next/app'
+function MyApp({ Component, pageProps }: AppProps)
+```
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+# Styles
+- Scoped CSS
+    - Um css não afeta outro componente
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+- Css modules
+    - salvar arquivo file.module.css
+    - usar css module
+        - Sempre começar estilos com uma class ou id
+        ```ts
+        import styles from '../styles/home.module.css'
+        <h1> className={styles.title}>Hello word</h1>
+        ```
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+- Install scss
+```sh
+npm i sass
+```
 
-## Learn More
+- Configurar uma fonte externa
+    - Deve ser feito apenas uma unica vez
+    - Nao utlizar o _app.tsx pois ele é recarregado quando muda a pag
+    - Criar um arquivo _document.tsx
+        - Carregado uma unica vez 
+        - Um componente react
 
-To learn more about Next.js, take a look at the following resources:
+- Dentro document ja coloca 
+    - doctype
+    - charset
+    - meta http-equive
+    - meta name viewport
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```tsx
+import Document, { Html, Head, Main, NextScript } from  'next/document'
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+export default class MyDocument extends Document {
+  reunder() {        
+    <Html>
+        <Head>
+            <title>Document</title>
+        </Head>
+        <body>
+          {/* todo conteudo renderizado no lugar do main */}
+            <Main />
+            {/* onde next coloca os arquivos js pra funcionar */}
+            <NextScript />
+        </body>
+    </Html>
+  }
+}
+```
