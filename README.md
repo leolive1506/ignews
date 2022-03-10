@@ -60,6 +60,14 @@ export default class MyDocument extends Document {
 }
 ```
 
+
+
+# Formar fazer chamada em Next
+
+## Cliente-side
+- Pelo cliente
+- Quando não precisa indexação
+- Informação q não necessáriamente tem que tem ta la quando a pag for carregada
 # Server side rendering 
 - Quando tem operação api acontece nivel do componente, utilizando useEffect, por exemplo
   - Essa chamada so é feita no browser
@@ -81,8 +89,38 @@ export const getServerSideProps: GetServerSideProps = async () => {
   }
 }
 ```
+## Static Site Generation (SSG)
+- Uma pessoa acessou e fez as chamadas
+- Faz mesmo processo so SSR
+- Além de retornar pro browser
+- Salva o html forma fisica (estático)
+- Prox vez que for acessar mesma tela, ao em vez de fazer toda chamada de novo, retorna html pront ja
+  - Util quando quer pegar informações que nao mudam sempre
 
-# Static Site Generation (SSG)
+```ts
+export const getStaticProps: GetStaticProps = async () => {
+  return {
+    props: {
+      nome: 'Leonardo'
+    },
+    // quando tempo em segundos mantém a pagina sem precisar sem revalidado
+    revalidate: 60 * 60 * 24 // 24 horas
+  }
+}
+```
+
+## Diferenças entre getStaticProps e getServerSideProps
+- getStaticProps
+  - Salva html e não muda até o tempo do revalidate
+  - Mais performático
+  - So pode usar em paginas que podem ser estáticas
+
+- getServerSideProps
+  - Permite ser mais dinamicos
+  - Ex: Informações usuários logados
+
+- Se não tiver necessidade indexação, motores busca
+  - Maioria das vezes é melhor fazer essa chamada pelo cliente (ex: useEffect) do que pelo servidor node
 ## Dicas CSS 
 - Ao colocar height e line-height mesmo tamanho, conteudo fica centralizado
 ```scss
