@@ -64,7 +64,7 @@ export default class MyDocument extends Document {
 
 # Formar fazer chamada em Next
 
-## Cliente-side
+## Cliente-side (ex: Por use Effect)
 - Pelo cliente
 - Quando não precisa indexação
 - Informação q não necessáriamente tem que tem ta la quando a pag for carregada

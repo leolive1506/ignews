@@ -1,21 +1,18 @@
-Api rules
-- rotas no app que comportam como app backend
-
-Sobre App
+# Sobre App
 - Stripe (pagamentos)
 - FaunaDb (bando de dados)
-	- Espec�fico p aplica�oes serveless
+	- Específico p aplicaoes serveless
 		- Serveless -> cada rota vai ser executada em ambiente isolada
 			- Maneira superficial, no Serveless so quando chamar que instancia a 'maquina virtual' executa, deu resultado, deleta 'maquina virtual'
-	- Toda comunica�ao com faunadb e feita atraves http, como chamada rest
+	- Toda comunica~çao com faunadb e feita atraves http, como chamada rest
 	- Poderia usar tbm o dynamodb
 
 - Prismic CMS (Content Manage System)
-	- Um painel adm pra cadastrar informa�oes e servir atraves de uma api
+	- Um painel adm pra cadastrar informaçoes e servir atraves de uma api
 
 - Github -> autenticacao (OAuth)
 
-- Fluxo Aplicacao
+# Fluxo Aplicacao
 	- Home
 		- Autenticacao
 			- Dados github
@@ -26,14 +23,14 @@ Sobre App
 	- Usuario pode consumir os posts
 		- Prismic serve os posts
 
-- Fundamentos Next
+# Fundamentos Next
 	- Framework React
 	- React 
 		- SPA (single-page application)
 		
 		- Browser (cliente)
-			- C�digo React (bundle.js)
-			- Constru�da pelo cliente e js
+			- Código React (bundle.js)
+			- Construída pelo cliente e js
 			- Sem js habilidatado nao existe aplicacao
 	- Next
 		- SSR (server-side-rendering)
