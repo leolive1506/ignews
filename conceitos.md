@@ -56,3 +56,6 @@
 - .env.test
 - .env.development
 - .env.production
+
+- Variáveis ambientes que precisar ser publicas (não estão dentro pasta api, ou getServerSideProps, getStaticProps)
+  - Começara com NEXT_PUBLIC_RESTO_DO_NOME

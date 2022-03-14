@@ -295,6 +295,115 @@ export default NextAuth({
     },
   }
 })
+```
+
+# Pagamento no stripe
+## [Gerando uma sessão de checkout](https://stripe.com/docs/api/checkout/sessions)
+- Url p redirecionar usuário p preecher informações de pagamentos, quando preecher tudo e redirecionado de volta p aplicação
+
+```ts
+import { NextApiRequest, NextApiResponse } from "next";
+import { stripe } from '../../services/stripe'
+import { getSession } from 'next-auth/react'
+import { fauna } from "../../services/fauna";
+import { query as q } from 'faunadb'
+
+type User = {
+  ref: {
+    id: string
+  }
+  data: {
+    stripe_customer_id: string
+  }
+}
+export default async function Subscribe (req: NextApiRequest, res: NextApiResponse) {
+  if (req.method === 'POST') {
+    // criar um customer (user) dentro do painel do strip, pegar qual user logado no app
+    // dados salvos ficam nos cookies, é possível acessoar pelo back e front
+    // dificilmente ira salvar informações no localStorage, pq fica disponível so no front
+    const session = await getSession({ req })
+
+    const user = await fauna.query<User>(
+      q.Get(
+        q.Match(
+          q.Index('user_by_email'),
+          q.Casefold(session.user.email)
+        )
+      )
+    )
+
+    let customerId = user.data.stripe_customer_id
+    if(!customerId) {
+      // verificar se ja tem o stripe_customer_id
+      const stripeCustomer = await stripe.customers.create({
+        email: session.user.email
+      })
+
+      // verificar se o user ja existe antes de criar um novo
+      await fauna.query(
+        q.Update(
+          // passar ref (id)
+          q.Ref(q.Collection('users'), user.ref.id),
+          {
+            data: { stripe_customer_id: stripeCustomer.id}
+          }
+        )
+      )
+
+      customerId = stripeCustomer.id
+    }
 
 
+    const stripeCheckoutSession = await stripe.checkout.sessions.create({
+      // quem esta comprando, passando id do user no stripe
+      customer: customerId,
+      // quais metodos pagamanto vai aceitar, se quiser aceitar todos não precisa colocar nada
+      payment_method_types: ['card'],
+      // quero obrigar user preecher endereço ou deixar automático
+      billing_address_collection: 'required',
+      // quais os items
+      line_items: [
+        {
+          // id do preço
+          price: 'price_1KbmalBYjUp74OA8ywxH3gf4',
+          quantity: 1
+        }
+      ],
+      // pagamento recorrente
+      mode: 'subscription',
+      // cupom desconto permitido
+      allow_promotion_codes: true,
+      success_url: process.env.STRIPE_SUCCESS_URL,
+      cancel_url: process.env.STRIPE_CANCEL_URL
+    })
+
+    // retornar o id mas consegue converter em uma url
+    return res.status(200).json({ sessionId: stripeCheckoutSession.id })
+  } else {
+    // falando que so aceita metodos post
+    res.setHeader('Allow', 'POST')
+    res.status(405).end('Method not allowed')
+  }
+}
+```
+
+# Stripe tem duas sdk
+- Uma backend (precisa passar chave)
+  - services/stripe.ts
+- Uma frontend (não precisa passar chave)
+  - services/stripe-js.ts
+```sh
+npm i @stripe/stripe-js
+```
+
+```ts
+import { loadStripe } from '@stripe/stripe-js'
+
+export async function getStripeJs() {
+  // passar chave publica
+  // desenvolvedores -> chaves da api -> Chave publicável
+  const stripeJs = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY)
+
+  return stripeJs
+}
 ```
