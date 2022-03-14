@@ -49,3 +49,10 @@
 					- Ou nao esperam chamadas api
 				- Com SSR Browser aguarda resultado servidor next
 		- Nexjs
+# Variaveis ambientes NextJS
+- .env.local
+  - Rodando projeto local 
+
+- .env.test
+- .env.development
+- .env.production

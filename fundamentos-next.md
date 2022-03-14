@@ -199,10 +199,3 @@ export const getServerSideProps: GetServerSideProps = async () => {
   }
 }
 ```
-# Variaveis ambientes NextJS
-- .env.local
-  - Rodando projeto local 
-
-- .env.test
-- .env.development
-- .env.production
