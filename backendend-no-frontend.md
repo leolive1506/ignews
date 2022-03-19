@@ -407,3 +407,30 @@ export async function getStripeJs() {
   return stripeJs
 }
 ```
+
+# Webhooks
+- Quando Integra com ferramenta de terceiros
+  - Ferramentas usam web hooks pra avisar nosso app que aconteceu algo
+
+  - Ex: 
+    - Falha pagamento pq cartão ta estourado e precisar cancelar incrição
+
+- Isso ocorre normalmente por alguma rota http (Ex: localhost:3000/api/webhooks)
+- Ir em settings > checkout e payment links > Configurar webhooks
+  - Se app estiver on coloca um endopoint
+    - Como não ta on, precisa usar CLI stripe pq o stripe nao consegui localizar localhost
+- [Baixar](https://github.com/stripe/stripe-cli/releases/tag/v1.8.1) e extrair na raiz do projeto (caso seja windows, se nao seguir [orientação da docs](https://stripe.com/docs/stripe-cli))
+
+```sh
+.\stripe.exe -h 
+```
+- Fazer login
+```sh
+.\stripe.exe login
+
+```
+- Criar arquivo webhooks dentro de api
+- Ouvir web hooks
+```sh
+.\stripe.exe listen --forward-to localhost:3000/api/webhooks
+```
