@@ -431,6 +431,122 @@ export async function getStripeJs() {
 ```
 - Criar arquivo webhooks dentro de api
 - Ouvir web hooks
+
 ```sh
 .\stripe.exe listen --forward-to localhost:3000/api/webhooks
 ```
+
+- Quando stripe envia webhooks ele envia em formato de streamer
+  - Vai recebendo aos poucos os dados
+
+## Toda pasta que tem um _ na frente não é tratada como rota
+
+# Dicas gerais
+- Set é como se fosse um array que não pode ter dados duplicados
+```ts
+const relevantEvents = new Set([])
+
+const type = event.type // tipos eventos
+if(relevantEvents.has(type)) {
+  console.log('Evento recebido', event)
+}
+```
+
+## Toda pasta que tem um _ na frente não é tratada como rota
+
+```ts
+import { NextApiRequest, NextApiResponse } from "next";
+import { Readable } from 'stream'
+import Stripe from 'stripe'
+import { stripe } from '../../services/stripe'
+
+// função converte readable stream em string
+async function buffer(readable: Readable) {
+  const chunks = []
+
+  for await (const chunk of readable) {
+    chunks.push(
+      typeof chunks === 'string' ? Buffer.from(chunk) : chunk
+    )
+  }
+
+  return Buffer.concat(chunks)
+}
+
+// next entende q toda req vem como json ou form, etc
+// aqui ela vem como stream
+// disable o entendimento padrão do next sobre oq vem na req
+
+export const config = {
+  api: { 
+    bodyParser: false
+  }
+}
+
+// eventos que importam p app
+const relevantEvents = new Set([
+  'checkout.session.completed'
+])
+
+export default async function Webhooks (req: NextApiRequest, res: NextApiResponse) {
+  if (req.method === 'POST') {
+    // ler usando readable
+    const buf = await buffer(req)
+
+    // quando cria um webhook, é uma rota. ALguem pode tetnar ficar envianado dados por post e pode acontecer comportamentos indesajados
+    // quando alguma api trabalha com webhook, normalmente tem um signing secret pra evitar isso
+    // ao rodar o listen do stripe ele disponibiliza
+    const secret = req.headers['stripe-signature'] // campo enviado pelo stripe
+    // verificando se valores batem com variaveis ambientes
+
+    let event: Stripe.Event
+    try {
+      event = stripe.webhooks.constructEvent(buf, secret, process.env.STRIPE_WEBHOOK_SECRET)
+    } catch (err) {
+      return res.status(400).send(`Webhooks error: ${err.message}`)
+    }
+
+    const { type } = event // tipos eventos
+    if(relevantEvents.has(type)) {
+      // console.log('Evento recebido', event)
+      try {
+        switch (type) {
+          case 'checkout.session.completed':
+            const checkoutSession = event.data.object as Stripe.Checkout.Session
+
+            await saveSubscription(
+              checkoutSession.subscription.toString(),
+              checkoutSession.customer.toString()
+            )
+
+            break;
+          default:
+            throw new Error('Unhandled event')
+        }
+      } catch (err) {
+        return res.json({ error: 'Webhook handler failed.'})
+      }
+    }
+    res.json({ received: true })
+  } else {
+      // falando que so aceita somente metodos post
+      res.setHeader('Allow', 'POST')
+      res.status(405).end('Method not allowed')
+  }
+}
+```
+
+- Ou
+
+# Dicas gerais
+- Set é como se fosse um array que não pode ter dados duplicados
+```ts
+const relevantEvents = new Set([])
+
+const type = event.type // tipos eventos
+if(relevantEvents.has(type)) {
+  console.log('Evento recebido', event)
+}
+```
+
+## Toda pasta que tem um _ na frente não é tratada como rota
