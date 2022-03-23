@@ -43,6 +43,20 @@
   - Se quiser alterar pra private api, é necessário passar uma chave (token) p toda req pra busca conteudo
 - IR em api & security
   - Fazer alterações necessárias e pegar permanet access tokens 
+- Instalar o client 
+- Instalação dom pra converter resultado da api em html ou texto
+```sh
+npm i prismic-dom
+```
   
-  
-  
+# Dicas gerais
+- Ver oq tem dentro do console que ira rodar no server node
+```ts
+console.log(JSON.stringify(response, null, 2))
+```
+
+- Quando busca dados api de terceiros, não vem na formatação desejadas normalmente
+  - Pode formatar no getStaticProps ou getServerSideProps ou no html
+    - Quando formatar no getStaticProps, isso sera feito somente quando obj for renderizado primeira vez
+
+  - Dar preferencia pra formatar em getStaticProps ou getServerSideProps

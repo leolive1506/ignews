@@ -1,8 +1,21 @@
+import { GetStaticProps } from 'next'
 import Head from 'next/head'
 import React from 'react'
+import Prismic from '@prismicio/client'
+import { getPrimisClient } from '../../services/prismic'
 import styles from './styles.module.scss'
+import { RichText } from 'prismic-dom'
 
-function Posts() {
+type Post = {
+  slug: string
+  title: string
+  excerpt: string
+  updatedAt: string
+}
+interface PostsProps {
+  posts: Post[ ]
+}
+export default function Posts({ posts }: PostsProps) {
   return (
     <>
       <Head>
@@ -11,30 +24,49 @@ function Posts() {
 
       <main className={styles.container}>
         <div className={styles.posts}>
-          <a href="#">
-            <time>12 de março de 2021</time>
-            <strong>Creating a Monorepo with lerna & Yarn Workspaces</strong>
-            <p>In this guid, you will learn how to create a Monorepo to manage multiple packages with a shared build, test, and, release process</p>
-          </a>
-          <a href="#">
-            <time>12 de março de 2021</time>
-            <strong>Creating a Monorepo with lerna & Yarn Workspaces</strong>
-            <p>In this guid, you will learn how to create a Monorepo to manage multiple packages with a shared build, test, and, release process</p>
-          </a>
-          <a href="#">
-            <time>12 de março de 2021</time>
-            <strong>Creating a Monorepo with lerna & Yarn Workspaces</strong>
-            <p>In this guid, you will learn how to create a Monorepo to manage multiple packages with a shared build, test, and, release process</p>
-          </a>
-          <a href="#">
-            <time>12 de março de 2021</time>
-            <strong>Creating a Monorepo with lerna & Yarn Workspaces</strong>
-            <p>In this guid, you will learn how to create a Monorepo to manage multiple packages with a shared build, test, and, release process</p>
-          </a>
+          { posts.map(post => (
+            <a key={post.slug} href="#" >
+              <time>{post.updatedAt}</time>
+              <strong>{post.title}</strong>
+              <p>{post.excerpt}</p>
+            </a>
+          )) }
         </div>
       </main>
     </>
   )
 }
 
-export default Posts
+export const getStaticProps: GetStaticProps = async () => {
+  const prismic = getPrimisClient()
+
+  const response = await prismic.query<any>([
+    // pegando todos posts
+    Prismic.predicates.at('document.type', 'post')
+  ], {
+    // dados que quero pegar
+    fetch: ['post.title', 'post.content'],
+    // quantos posts trazer
+    pageSize: 100,
+  })
+    
+  const posts = response.results.map(post => {
+    return {
+      slug: post.uid,
+      title: RichText.asText(post.data.title),
+      // pegar resumo do post
+      excerpt: post.data.content.find(content => content.type === 'paragraph')?.text ?? '',
+      updated: new Date(post.last_publication_date).toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric'
+      })
+    } 
+  })
+
+  return { 
+    props: {
+      posts
+    }
+  }
+}
