@@ -60,3 +60,61 @@ console.log(JSON.stringify(response, null, 2))
     - Quando formatar no getStaticProps, isso sera feito somente quando obj for renderizado primeira vez
 
   - Dar preferencia pra formatar em getStaticProps ou getServerSideProps
+
+# Links
+- Next roda react por tras
+  - Muita coisa em uma pag e outra é a reaproveitada entre uma pag e outra
+  - Se usar href normal da pag, ele recarrega toda pag do zero novamente
+- Usar link do next/link e passar href p link
+```tsx
+<Link href="/">
+  <a className={styles.active} href="#">Home</a>
+</Link>
+```
+
+- Prefetch
+  - Deixa a pag pre carregada
+```tsx
+<Link href="/posts" prefetch>
+  <a className={styles.active} href="#">Posts</a>
+</Link>
+```
+
+## CloneElement
+- Clone um el ou children, mas permite add uma propriedade ao el da primeira camada
+- Ex:
+  - Ver qual link ta ativo
+```tsx
+// dentro header tem os link pra nav
+<ActiveLink activeClassName={styles.active} href="/">
+  <a>Home</a>
+</ActiveLink>
+```
+
+- Criar um componente pra ver se a rota esta ativa
+```tsx
+interface ActiveLinkProps extends LinkProps {
+  children: ReactElement
+  activeClassName: string
+}
+
+function ActiveLink({ children, activeClassName, ...rest}: ActiveLinkProps) {
+  const { asPath } = useRouter()
+
+  // comparando com href
+  const className = asPath === rest.href ? activeClassName : ''
+
+  return (
+    <Link {...rest}>
+      {cloneElement(children, {
+        className
+      })}
+    </Link>
+  )
+}
+```
+
+- Permitir que html vindo de 3 seja renderizado
+```tsx
+<div dangerouslySetInnerHTML={{ __html: post.content }} />
+```

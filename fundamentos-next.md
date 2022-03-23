@@ -96,6 +96,8 @@ export const getServerSideProps: GetServerSideProps = async () => {
 - Salva o html forma fisica (estático)
 - Prox vez que for acessar mesma tela, ao em vez de fazer toda chamada de novo, retorna html pront ja
   - Util quando quer pegar informações que nao mudam sempre
+- Toda pag que é gerada de forma static, não é pag protegida
+  - Quando precisar de user logado pra acessar conteudo, usar getServerSideProps
 
 ```ts
 export const getStaticProps: GetStaticProps = async () => {
