@@ -49,14 +49,14 @@ export const getStaticProps: GetStaticProps = async () => {
     // quantos posts trazer
     pageSize: 100,
   })
-    
+
   const posts = response.results.map(post => {
     return {
       slug: post.uid,
       title: RichText.asText(post.data.title),
       // pegar resumo do post
       excerpt: post.data.content.find(content => content.type === 'paragraph')?.text ?? '',
-      updated: new Date(post.last_publication_date).toLocaleDateString('pt-BR', {
+      updatedAt: new Date(post.last_publication_date).toLocaleDateString('pt-BR', {
         day: '2-digit',
         month: 'long',
         year: 'numeric'
