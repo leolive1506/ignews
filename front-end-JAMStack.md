@@ -61,7 +61,7 @@ console.log(JSON.stringify(response, null, 2))
 
   - Dar preferencia pra formatar em getStaticProps ou getServerSideProps
 
-# Links
+## Links
 - Next roda react por tras
   - Muita coisa em uma pag e outra é a reaproveitada entre uma pag e outra
   - Se usar href normal da pag, ele recarrega toda pag do zero novamente
@@ -80,7 +80,13 @@ console.log(JSON.stringify(response, null, 2))
 </Link>
 ```
 
-## CloneElement
+## Permitir que html vindo de 3º seja renderizado
+```tsx
+<div dangerouslySetInnerHTML={{ __html: post.content }} />
+```
+
+## Informacoes compartilhadas entre todos componentes
+# CloneElement
 - Clone um el ou children, mas permite add uma propriedade ao el da primeira camada
 - Ex:
   - Ver qual link ta ativo
@@ -114,7 +120,38 @@ function ActiveLink({ children, activeClassName, ...rest}: ActiveLinkProps) {
 }
 ```
 
-- Permitir que html vindo de 3 seja renderizado
-```tsx
-<div dangerouslySetInnerHTML={{ __html: post.content }} />
+- Pegar as coisas em qualquer bolinha
+  - União
+
+- Pegar as coisas qeu batem com as duas condições, quanto na esquerda quanto na direita
+  - Intercessão
+
+- Pegar as coisas que tem somente em uma bolinha
+  - Diferença
+
+
+# Redirecionamento
+- Na camada next
+```ts
+if(!session.activeSubscription) {
+  return {
+    redirect: {
+      destination: '/',
+      // redirecionando so pq não tem assinatura
+      permanent: false
+    }
+  }
+}
+```
+
+- Redirecionar user de forma problematica, por uma função (não por um botão que ele clica)
+```ts
+const router = useRouter()
+
+async function handleSubscribe () {
+  if(session.activeSubscription) {
+    router.push('/posts')
+    return;
+  }
+}
 ```

@@ -59,3 +59,6 @@
 
 - Variáveis ambientes que precisar ser publicas (não estão dentro pasta api, ou getServerSideProps, getStaticProps)
   - Começara com NEXT_PUBLIC_RESTO_DO_NOME
+
+# Pq tem um preview do produto quando não tiver assinatura?
+- Quando google for acesar o site ele não vai ter uma assinatura, logo não poderia anexar

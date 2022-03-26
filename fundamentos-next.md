@@ -98,6 +98,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
   - Util quando quer pegar informações que nao mudam sempre
 - Toda pag que é gerada de forma static, não é pag protegida
   - Quando precisar de user logado pra acessar conteudo, usar getServerSideProps
+- Não possui req dentro static props
 
 ```ts
 export const getStaticProps: GetStaticProps = async () => {
@@ -110,6 +111,62 @@ export const getStaticProps: GetStaticProps = async () => {
   }
 }
 ```
+
+- Dois formatos
+  1. Gerar as pag static durante a build
+    - Criar previamente html estático previamente de todas as pag quando executar npm run build
+      - Com objetivo de quando a 1º pessoa acessar ja esteja la de forma static e não precise aguardar nada ser feito
+    - Atende quando o numero não é mt grande
+  2. Gerar a pag no primeiro acesso 
+    - So quando a pessoa acessar qeu sera gerado a pag static
+    - Ideal pra quanto tem muita quantidade pq é gerado de acordo com os acessos
+
+  3. Metade de cada uma
+    - Ex:
+      - 30 produtos mais acessados
+      - Gerar a pag static apenas desses 30 produtos e o restando gerado de acordo com o acesso
+
+  - getStaticPaths
+    - So existe em rotas que tem params dinamicos
+    - Retorna quais caminhos quero gerar durante a build (em um array paths)
+      - array vazio, gerado de acordo com acesso
+    - fallback
+      - Tres valores
+        - True
+          - Se alguem tentar acessar um post que não foi acessado de forma static
+              carrega o conteudo pelo lado do cliente
+          - Causa layout shift
+          - Não é mt bom pra anexações gogle
+        - False
+          - Se os conteudo não forem gerados ainda, retorna um 404 e não tenta buscar conteudo
+        - Blocking
+          - Quando tentar acessar conteudo q ainda não foi gerado de forma static, tenta carregar o conteudo mas executa na camada do next so quando carregar que mostra todo conteudo da pag
+
+      - Exemplo array vazio
+      ```tsx  
+      export const getStaticPaths = () => {
+        return {
+          paths: [],
+          fallback: 'blocking'
+        }
+      }
+      ```  
+
+      - Exemplo items no array
+        - Rodas npm run build
+      ```tsx  
+      export const getStaticPaths: GetStaticPaths = async () => {
+        // fazer chamada pra carregar os items pra ser gerado na build
+        // aqui feito de forma static
+        return {
+          paths: [
+            { params: {slug: 'jamstack-geleia-de-javascript-api-e-markup'} }
+          ],
+          fallback: 'blocking'
+        }
+      }
+      ```  
+  
 
 ## Diferenças entre getStaticProps e getServerSideProps
 - getStaticProps

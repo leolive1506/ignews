@@ -41,9 +41,15 @@ export const getServerSideProps: GetServerSideProps = async ({ req, params }) =>
   const { slug } = params
 
   // verificar se ta logado e assinatura ativa
-  // if(!session) {
-
-  // }
+  if(!session?.activeSubscription) {
+    return {
+      redirect: {
+        destination: `/posts/preview/${slug}`,
+        // redirecionando so pq não tem assinatura
+        permanent: false
+      }
+    }
+  }
 
   // pegar client do prismic
   const prismic = getPrimisClient(req)
@@ -65,6 +71,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, params }) =>
   return {
     props: {
       post
-    }
+    },
   }
 }
